@@ -5,13 +5,9 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# Load trained model
 model = joblib.load("crop_model.pkl")
 
 
-# ----------------------------
-# Create Database
-# ----------------------------
 def create_database():
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
@@ -38,17 +34,10 @@ def create_database():
 create_database()
 
 
-# ----------------------------
-# Home Page
-# ----------------------------
 @app.route("/")
 def home():
     return render_template("index.html")
 
-
-# ----------------------------
-# Prediction Route
-# ----------------------------
 @app.route("/predict", methods=["POST"])
 def predict():
 
@@ -118,8 +107,5 @@ def predict():
         )
 
 
-# ----------------------------
-# Run Flask
-# ----------------------------
 if __name__ == "__main__":
     app.run(debug=True)

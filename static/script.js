@@ -1,4 +1,4 @@
-// Wait until the page loads
+
 document.addEventListener("DOMContentLoaded", function () {
 
     const form = document.querySelector("form");
