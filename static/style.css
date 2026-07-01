@@ -1,12 +1,12 @@
 body{
-    background:#27F5DA;
+    background: linear-gradient(135deg, #E8F5E9 0%, #B2DFDB 100%);
     font-family:Arial;
 }
 
 .container{
     width:400px;
     margin:40px auto;
-    background:#37E6A6;
+    background:#4CAF50;
     padding:25px;
     border-radius:10px;
     text-align:center;

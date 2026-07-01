@@ -1,0 +1,212 @@
+import os
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter, landscape
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+
+def create_journey_map():
+    # Setup document in Landscape mode matching the layout block
+    pdf_filename = "SmartLender_Customer_Journey_Map.pdf"
+    doc = SimpleDocTemplate(
+        pdf_filename,
+        pagesize=landscape(letter),
+        rightMargin=30,
+        leftMargin=30,
+        topMargin=30,
+        bottomMargin=30
+    )
+    
+    styles = getSampleStyleSheet()
+    
+    # Custom styles to fit the data neatly
+    brand_left_style = ParagraphStyle(
+        'BrandLeft',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=14,
+        leading=16,
+        textColor=colors.HexColor('#0056b3')
+    )
+    
+    brand_right_style = ParagraphStyle(
+        'BrandRight',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=12,
+        leading=14,
+        alignment=2, # Right aligned
+        textColor=colors.HexColor('#ff6600')
+    )
+    
+    sub_brand_style = ParagraphStyle(
+        'SubBrand',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=8,
+        leading=10,
+        textColor=colors.HexColor('#555555')
+    )
+    
+    title_style = ParagraphStyle(
+        'TitleStyle',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=16,
+        leading=18,
+        alignment=1, # Centered
+        textColor=colors.black
+    )
+    
+    meta_style = ParagraphStyle(
+        'MetaStyle',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=10,
+        leading=12
+    )
+    
+    table_header_style = ParagraphStyle(
+        'TableHeader',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=11,
+        leading=13,
+        textColor=colors.black
+    )
+    
+    row_header_style = ParagraphStyle(
+        'RowHeader',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=10,
+        leading=12,
+        textColor=colors.black
+    )
+    
+    body_style = ParagraphStyle(
+        'BodyTextCustom',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=9,
+        leading=12,
+        textColor=colors.HexColor('#222222')
+    )
+
+    story = []
+
+    # 1. Top Header Row
+    header_data = [
+        [Paragraph("SMARTBRIDGE<br/><font size=8 color='#555555'>Let's Bridge the Gap</font>", brand_left_style), 
+         Paragraph("SKILL WALLET<br/><font size=7 color='#555555'>A SmartBridge Product</font>", brand_right_style)]
+    ]
+    header_table = Table(header_data, colWidths=[5.0*inch, 5.0*inch])
+    header_table.setStyle(TableStyle([
+        ('VALIGN', (0,0), (-1,-1), 'TOP'),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 0),
+    ]))
+    story.append(header_table)
+    story.append(Spacer(1, 15))
+
+    # 2. Main Title Bar
+    title_data = [[Paragraph("Customer Journey Map", title_style)]]
+    title_table = Table(title_data, colWidths=[10.0*inch])
+    title_table.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#e6e6e6')),
+        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('BOX', (0,0), (-1,-1), 1, colors.HexColor('#aaaaaa')),
+        ('TOPPADDING', (0,0), (-1,-1), 8),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 8),
+    ]))
+    story.append(title_table)
+    story.append(Spacer(1, 15))
+
+    # 3. Metadata Section Grid
+    meta_data = [
+        [Paragraph("<b>Date</b>", meta_style), Paragraph("15 March 2026", meta_style), Paragraph("<b>Team ID</b>", meta_style), Paragraph("XXXXXX", meta_style)],
+        [Paragraph("<b>Project Name</b>", meta_style), Paragraph("Smart Lender", meta_style), Paragraph("<b>Maximum Marks</b>", meta_style), Paragraph("2 Marks", meta_style)]
+    ]
+    meta_table = Table(meta_data, colWidths=[2.0*inch, 3.0*inch, 2.0*inch, 3.0*inch])
+    meta_table.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (0,-1), colors.HexColor('#f9f9f9')),
+        ('BACKGROUND', (2,0), (2,-1), colors.HexColor('#f9f9f9')),
+        ('GRID', (0,0), (-1,-1), 1, colors.HexColor('#cccccc')),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('PADDING', (0,0), (-1,-1), 6),
+    ]))
+    story.append(meta_table)
+    story.append(Spacer(1, 20))
+
+    # 4. Main Matrix Layout Data Configuration
+    matrix_data = [
+        # Table Header Row
+        [
+            Paragraph("Phase of Journey", table_header_style),
+            Paragraph("Stage 1: Application Submission", table_header_style),
+            Paragraph("Stage 2: Automated Risk Evaluation", table_header_style),
+            Paragraph("Stage 3: Decisioning & Compliance", table_header_style)
+        ],
+        # Actions Row
+        [
+            Paragraph("Actions<br/><font size=7 color='#555555'>What does the customer do?</font>", row_header_style),
+            Paragraph("The loan applicant or credit officer inputs structured demographics (gender, marital status, income, credit history) into the web interface.", body_style),
+            Paragraph("The system processes inputs instantly through the deployed Flask application using the optimized machine learning pipeline.", body_style),
+            Paragraph("The financial analyst or credit officer reviews the instantaneous approval prediction or high-risk flag.", body_style)
+        ],
+        # Touchpoint Row
+        [
+            Paragraph("Touchpoint<br/><font size=7 color='#555555'>What part of the service do they interact with?</font>", row_header_style),
+            Paragraph("Flask Web UI Frontend (Input forms, data submission fields).", body_style),
+            Paragraph("The Backend Core (Optimized XGBoost model deployed on IBM Cloud).", body_style),
+            Paragraph("Unified Web Dashboard UI (Approval screen or high-risk alert flags).", body_style)
+        ],
+        # Thought Row
+        [
+            Paragraph("Customer Thought<br/><font size=7 color='#555555'>What is the customer thinking?</font>", row_header_style),
+            Paragraph('"I hope this form is quick to fill out and securely captures all my financial background features."', body_style),
+            Paragraph('"Is the system processing all 9 parameters accurately without any system lag?"', body_style),
+            Paragraph('"Can I safely fast-track this low-risk applicant, or should I halt this high-risk file for verification?"', body_style)
+        ],
+        # Feeling Row
+        [
+            Paragraph("Customer Feeling<br/><font size=7 color='#555555'>What is the customer feeling?</font>", row_header_style),
+            Paragraph("Optimistic but cautious about data accuracy and entry time.", body_style),
+            Paragraph("Expectant; waiting for rapid, high-confidence validation.", body_style),
+            Paragraph("Confident if fast-tracked; alert and critical if flagged as high-risk.", body_style)
+        ],
+        # Process Ownership Row
+        [
+            Paragraph("Process Ownership<br/><font size=7 color='#555555'>Who is in the lead on this?</font>", row_header_style),
+            Paragraph("Frontend Web Developer / Credit Intake Team.", body_style),
+            Paragraph("Machine Learning Engineer / IBM Cloud DevOps Admin.", body_style),
+            Paragraph("Financial Analyst / Bank Credit Risk Officer.", body_style)
+        ],
+        # Opportunities Row
+        [
+            Paragraph("Opportunities<br/><font size=7 color='#555555'>How can we improve this stage?</font>", row_header_style),
+            Paragraph("Implement real-time client-side form validation to prevent malformed profile inputs.", body_style),
+            Paragraph("Integrate deep learning models for unstructured data parsing (like automated bank statement reading).", body_style),
+            Paragraph("Introduce an explainable AI layer (like SHAP values) to show exactly why an applicant was flagged high-risk.", body_style)
+        ]
+    ]
+
+    # Column dimensions total exactly 10 inches to map perfectly on landscape letter layout
+    matrix_table = Table(matrix_data, colWidths=[2.2*inch, 2.6*inch, 2.6*inch, 2.6*inch])
+    matrix_table.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#e6e6e6')), # Header shading
+        ('BACKGROUND', (0,1), (0,-1), colors.HexColor('#f9f9f9')), # Left side column shading
+        ('GRID', (0,0), (-1,-1), 1, colors.HexColor('#333333')),   # High visibility borders
+        ('VALIGN', (0,0), (-1,-1), 'TOP'),
+        ('TOPPADDING', (0,0), (-1,-1), 8),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 8),
+        ('LEFTPADDING', (0,0), (-1,-1), 8),
+        ('RIGHTPADDING', (0,0), (-1,-1), 8),
+    ]))
+    story.append(matrix_table)
+    
+    # Build Document
+    doc.build(story)
+
+if __name__ == "__main__":
+    create_journey_map()
